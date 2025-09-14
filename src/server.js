@@ -13,7 +13,9 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: '*'
+}));
 app.use(morgan('combined'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -57,7 +59,7 @@ app.use((err, req, res, next) => {
 
 // Start server only if this file is run directly (not imported)
 if (require.main === module) {
-  // Connect to database first, then start server
+  // For traditional deployment (not serverless)
   database.connect().then(() => {
     app.listen(PORT, () => {
       console.log(`🚀 Srinagar Local Gems API server running on port ${PORT}`);
@@ -66,6 +68,10 @@ if (require.main === module) {
     console.error('Failed to start server:', error);
     process.exit(1);
   });
+} else if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+  // For serverless deployment (Vercel, AWS Lambda, etc.)
+  // Don't pre-connect to database, let each request handle its own connection
+  console.log('🔧 Running in serverless mode - connections handled per request');
 }
 
 module.exports = app;

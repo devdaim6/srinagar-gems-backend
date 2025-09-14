@@ -1,6 +1,7 @@
 const GemRequest = require('../models/GemRequest');
 const Gem = require('../models/Gem');
 const Joi = require('joi');
+const database = require('../config/database');
 
 /**
  * Submit a new gem request from mobile users
@@ -8,6 +9,8 @@ const Joi = require('joi');
  */
 const submitGemRequest = async (req, res) => {
   try {
+    // Ensure database connection is established (critical for serverless)
+    await database.ensureConnection();
     // Validation schema for gem requests
     const requestSchema = Joi.object({
       name: Joi.string().required().min(2).max(100).messages({
@@ -117,6 +120,9 @@ const submitGemRequest = async (req, res) => {
  */
 const getAllGemRequests = async (req, res) => {
   try {
+    // Ensure database connection is established (critical for serverless)
+    await database.ensureConnection();
+    
     const { status, category, page = 1, limit = 20 } = req.query;
     
     // Build query object
@@ -183,6 +189,9 @@ const getAllGemRequests = async (req, res) => {
  */
 const approveGemRequest = async (req, res) => {
   try {
+    // Ensure database connection is established (critical for serverless)
+    await database.ensureConnection();
+    
     const { id } = req.params;
     const { reviewNotes } = req.body;
     
@@ -278,6 +287,9 @@ const approveGemRequest = async (req, res) => {
  */
 const rejectGemRequest = async (req, res) => {
   try {
+    // Ensure database connection is established (critical for serverless)
+    await database.ensureConnection();
+    
     const { id } = req.params;
     const { reviewNotes } = req.body;
     
@@ -356,6 +368,9 @@ const rejectGemRequest = async (req, res) => {
  */
 const getGemRequestById = async (req, res) => {
   try {
+    // Ensure database connection is established (critical for serverless)
+    await database.ensureConnection();
+    
     const { id } = req.params;
 
     // Validate ObjectId format

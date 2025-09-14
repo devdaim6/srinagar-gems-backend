@@ -1,5 +1,6 @@
 const Gem = require('../models/Gem');
 const Joi = require('joi');
+const database = require('../config/database');
 
 /**
  * Get all gems with optional category filtering
@@ -7,6 +8,9 @@ const Joi = require('joi');
  */
 const getAllGems = async (req, res) => {
   try {
+    // Ensure database connection is established (critical for serverless)
+    await database.ensureConnection();
+    
     const { category } = req.query;
     
     // Build query object
@@ -33,8 +37,8 @@ const getAllGems = async (req, res) => {
       query.category = normalizedCategory;
     }
     
-    // Fetch gems from database
-    const gems = await Gem.find(query).sort({ createdAt: -1 });
+    // Fetch gems from database with timeout handling
+    const gems = await Gem.find(query).sort({ createdAt: -1 }).maxTimeMS(25000);
     
     // Return successful response
     res.status(200).json({
@@ -65,6 +69,9 @@ const getAllGems = async (req, res) => {
  */
 const getGemById = async (req, res) => {
   try {
+    // Ensure database connection is established (critical for serverless)
+    await database.ensureConnection();
+    
     const { id } = req.params;
     
     // Validate ObjectId format
@@ -81,7 +88,7 @@ const getGemById = async (req, res) => {
     }
     
     // Find gem by ID (explicitly include inactive ones to check status)
-    const gem = await Gem.findOne({ _id: id, isActive: { $in: [true, false] } });
+    const gem = await Gem.findOne({ _id: id, isActive: { $in: [true, false] } }).maxTimeMS(25000);
     
     // Check if gem exists
     if (!gem) {
@@ -201,6 +208,9 @@ const gemSchema = Joi.object({
  */
 const createGem = async (req, res) => {
   try {
+    // Ensure database connection is established (critical for serverless)
+    await database.ensureConnection();
+    
     // Validate request body
     const { error, value } = gemSchema.validate(req.body);
     if (error) {
@@ -263,6 +273,9 @@ const createGem = async (req, res) => {
  */
 const updateGem = async (req, res) => {
   try {
+    // Ensure database connection is established (critical for serverless)
+    await database.ensureConnection();
+    
     const { id } = req.params;
 
     // Validate ObjectId format
@@ -355,6 +368,9 @@ const updateGem = async (req, res) => {
  */
 const deleteGem = async (req, res) => {
   try {
+    // Ensure database connection is established (critical for serverless)
+    await database.ensureConnection();
+    
     const { id } = req.params;
 
     // Validate ObjectId format
