@@ -15,8 +15,6 @@ class DatabaseConfig {
       maxPoolSize: 5, // Reduce pool size for serverless
       serverSelectionTimeoutMS: 30000, // Increase timeout for cold starts
       socketTimeoutMS: 30000, // Increase socket timeout
-      bufferMaxEntries: 0, // Disable mongoose buffering
-      bufferCommands: false, // Disable mongoose buffering
       maxIdleTimeMS: 30000, // Close connections after 30 seconds of inactivity
       // Additional options for better serverless performance
       retryWrites: true,
